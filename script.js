@@ -20,7 +20,10 @@ const pasteButton=document.getElementById("paste-btn");
 const current_cell_id=document.getElementById("current-cell")
 
 const uploadJsonFile=document.getElementById("jsonfile");
-const addSheet=document.getElementById("add-sheet-Button");
+const addSheetButton=document.getElementById("add-sheet-Button");
+let buttonContainer=document.getElementById("button-container");
+const arrMatrix='arrMatrix';
+
 
 
 
@@ -30,72 +33,187 @@ let currentCell;
 let columns=26;
 let rows=100;
 
-let numsSheet=1;
-let currentSheetNum=1;
+let numSheets=1;
+let currSheetNum=1;
 
-addSheet.addEventListener("click",()=>{
-    let i=1;
-    let container=document.getElementById("button-container");
-    let sheet=document.createElement("button");
-    sheet.setAttribute("id",`Sheet${numsSheet}`)
-    sheet.innerText=`Sheet${numsSheet}`
+//these three function place major role in this project
+
+// addSheet.addEventListener("click",()=>{
    
-    currentSheetNum=numsSheet;
-    numsSheet++
-    container.append(sheet);
-    if(localStorage.getItem("arrMatrix")){
-        var oldMatrix=localStorage.getItem("arrMatrix");
+//     let sheet=document.createElement("button");
+//     numsSheet++
 
-        var newMatrix=[...JSON.parse(oldMatrix),matrix];
-        localStorage.setItem("arrMatrix",JSON.stringify(newMatrix))
 
-    }
-    else{
-        let tempMatrixArr=[matrix];
-        localStorage.setItem("arrMatrix",JSON.stringify(tempMatrixArr))
-
-    }
-    //claning up my virtual memory
-    for(let row=0;row<rows;row++){
-        matrix[row]=new Array(26)
-        for(let col=0;col<columns;col++){
-            matrix[row][col]={};
-        }
-        // console.log(matrix[i])
-        // console.log(matrix)
-    }
-    document.getElementById("sheet-no").innerText=`Sheet No-${currentSheetNum}`
-    //clening the exsting data
-    tBodyRow.innerHTML=``;
-
-    //doing same process just like upload and download but we storing in virtual memory i.e localStorage
+//     currentSheetNum=numsSheet;
+//     sheet.innerText=`Sheet${numsSheet}`
+   
+//     sheet.setAttribute("id",`Sheet-${currentSheetNum}`)
+//     sheet.setAttribute('onclick', 'viewSheet(event)');
     
-    for(let row=1;row<=rows;row++){
-        let tr=document.createElement('tr')
-        let th=document.createElement('th');
-        th.innerText=row;
-        //we need append first th in tr after we need put 100 cell in each row
-        tr.append(th)
-        for(let col=0;col<26;col++){
-            let td=document.createElement('td');
-            td.setAttribute('contenteditable','true');
-            td.id=`${String.fromCharCode(col+65)}${row}`
-            td.addEventListener("input",(event)=>onInputFn(event))
-            td.addEventListener('focus',(event)=>onFocusFn(event))
-    
-    
-            tr.append(td)
+
+//     buttonContainer.append(sheet);
+//     //to this point
+//     console.log(localStorage.getItem(arrMatrix))
+//     if(localStorage.getItem(arrMatrix)){
         
-        }
+//         var oldMatrix=localStorage.getItem(arrMatrix);
+//         console.log(oldMatrix)
+//         console.log("retriving")
+
+//         var newMatrix=[...JSON.parse(oldMatrix),matrix];
+//         // console.log(newMatrixArr)
+
+//         localStorage.setItem(arrMatrix,JSON.stringify(newMatrix))
+
+//     }
+//     else{
+//         console.log("setting")
+
+//         let tempMatrixArr=[matrix];
+//         localStorage.setItem(arrMatrix,JSON.stringify(tempMatrixArr))
+
+//     }
+//     //claning up my virtual memory
+//     for(let row=0;row<rows;row++){
+//         matrix[row]=new Array(26)
+//         for(let col=0;col<columns;col++){
+//             matrix[row][col]={};
+//         }
+//         // console.log(matrix[i])
+//         // console.log(matrix)
+//     }
+//     document.getElementById("sheet-no").innerText=`Sheet No -${currentSheetNum}`
+//     //clening the exsting data
+//     tBodyRow.innerHTML=``;
+
+//     //doing same process just like upload and download but we storing in virtual memory i.e localStorage
+//     //repeated code
+//     for(let row=1;row<=rows;row++){
+//         let tr=document.createElement('tr')
+//         let th=document.createElement('th');
+//         th.innerText=row;
+//         //we need append first th in tr after we need put 100 cell in each row
+//         tr.append(th)
+//         for(let col=0;col<26;col++){
+//             let td=document.createElement('td');
+//             td.setAttribute('contenteditable','true');
+//             td.id=`${String.fromCharCode(col+65)}${row}`
+//             td.addEventListener("input",(event)=>onInputFn(event))
+//             td.addEventListener('focus',(event)=>onFocusFn(event))
+    
+    
+//             tr.append(td)
         
+//         }
+        
+//         tBodyRow.append(tr);
+    
+    
+//     }
+
+// })
+addSheetButton.addEventListener('click', () => {
+    const btn = document.createElement('button');
+    numSheets++;
+    currSheetNum = numSheets;
+    btn.innerText = `Sheet ${numSheets}`;
+    btn.setAttribute('id', `sheet-${currSheetNum}`);
+    btn.setAttribute('onclick', 'viewSheet(event)');
+    buttonContainer.append(btn);
+    if (localStorage.getItem(arrMatrix)) {
+        var oldMatrixArr = localStorage.getItem(arrMatrix);
+        // oldMatrixArr -> string
+        var newMatrixArr = [...JSON.parse(oldMatrixArr), matrix];
+        localStorage.setItem(arrMatrix, JSON.stringify(newMatrixArr));
+    } else {
+        let tempMatrixArr = [matrix];
+        localStorage.setItem(arrMatrix, JSON.stringify(tempMatrixArr));
+    }
+
+    // cleanup my virtual memory
+    for (let row = 0; row < rows; row++) {
+        matrix[row] = new Array(columns);
+        for (let col = 0; col < columns; col++) {
+            matrix[row][col] = {};
+        }
+    }
+  document.getElementById("sheet-no").innerText=`Sheet No -${currSheetNum}`
+  tBodyRow.innerHTML=``;
+    // repeated Code please make function (DIY)
+    for (let row = 1; row <= rows; row++) { // Row -> 1-100
+        // i create a tr
+        let tr = document.createElement('tr');
+        // number cell
+        let th = document.createElement('th');
+        // injecting number in th
+        th.innerText = row;
+        tr.append(th);
+        for (let col = 0; col < columns; col++) { //COL-> 0->26 // A->Z
+            let td = document.createElement('td');
+            td.setAttribute('contenteditable', 'true');
+            // unique row and unique col
+            // ColRow
+            td.setAttribute('id', `${String.fromCharCode(col + 65)}${row}`);
+            // this event will revolve around input
+            td.addEventListener('input', (event) => onInputFn(event));
+
+            // this event revolves around focus on a cell
+            td.addEventListener('focus', (event) => onFocusFn(event));
+            tr.append(td);
+        }
         tBodyRow.append(tr);
-    
-    
     }
 
 })
 
-//these three function place major role in this project
+function viewSheet(event) {
+    let id = event.target.id.split('-')[1];
+    var matrixArr = JSON.parse(localStorage.getItem(arrMatrix));
+    matrix = matrixArr[id - 1];
+    // current matrix points towards the latest currentSheet;
+    // clean previousTable
+    tBodyRow.innerHTML = ``;
+    // repeated Code please make function (DIY)
+    for (let row = 1; row <= rows; row++) { // Row -> 1-100
+        // i create a tr
+        let tr = document.createElement('tr');
+        // number cell
+        let th = document.createElement('th');
+        // injecting number in th
+        th.innerText = row;
+        tr.append(th);
+        for (let col = 0; col < columns; col++) { //COL-> 0->26 // A->Z
+            let td = document.createElement('td');
+            td.setAttribute('contenteditable', 'true');
+            // unique row and unique col
+            // ColRow
+            td.setAttribute('id', `${String.fromCharCode(col + 65)}${row}`);
+            // this event will revolve around input
+            td.addEventListener('input', (event) => onInputFn(event));
+
+            // this event revolves around focus on a cell
+            td.addEventListener('focus', (event) => onFocusFn(event));
+            tr.append(td);
+        }
+        tBodyRow.append(tr);
+    }
+    matrix.forEach(row => {
+        row.forEach(cell => {
+            if (cell.id) {
+                var myCell = document.getElementById(cell.id);
+                myCell.innerText = cell.text;
+                myCell.style.cssText = cell.style;
+            }
+        })
+    })
+    currSheetNum=id;
+    document.getElementById("sheet-no").innerText=`Sheet No -${currSheetNum}`
+}
+// function viewSheet(event){
+//     let id=event.target.id.split('-')[1]
+//     console.log(id)
+// }
+
 //No1 
 
 function  uploadFileFn(event){
@@ -302,6 +420,7 @@ leftAlign.addEventListener("click",()=>{
     currentCell.style.textAlign='left',
     updatedMatrix(currentCell)
 })
+
 centerAlign.addEventListener("click",()=>{
     currentCell.style.textAlign='center'
     updatedMatrix(currentCell)
@@ -342,6 +461,7 @@ textColorButton.addEventListener("change",()=>{
 
 })
 
+//copy paste
 
 cutButton.addEventListener("click",(event)=>{
     // console.log(event.target.style);
